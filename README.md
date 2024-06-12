@@ -1,1 +1,1 @@
-# splitwise
+# Splitwise App
