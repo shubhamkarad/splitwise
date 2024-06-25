@@ -72,7 +72,15 @@ const ExpenseSplit = sequelize.define(
   }
 );
 
-Expense.hasMany(ExpenseSplit);
-ExpenseSplit.belongsTo(Expense);
+Expense.hasMany(ExpenseSplit, { foreignKey: "expenseId", onDelete: "CASCADE" });
+ExpenseSplit.belongsTo(Expense, { foreignKey: "expenseId" });
+
+ExpenseSplit.belongsTo(User, { foreignKey: "userId" });
+User.hasMany(ExpenseSplit, { foreignKey: "userId" });
+
+Expense.belongsTo(User, { as: "paidByUser", foreignKey: "paidBy" });
+
+Expense.belongsTo(Group, { foreignKey: "groupId" });
+Group.hasMany(Expense, { foreignKey: "groupId" });
 
 module.exports = { Expense, ExpenseSplit };

@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const {User} = require("../../models/user");
+const { User } = require("../../models/user");
 
 exports.register = async (req, res) => {
   try {
@@ -25,8 +25,31 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
-    res.json(token);
+    res.json({ token, user });
   } catch (err) {
     res.status(400).json({ error: err.message });
+  }
+};
+
+exports.getUsers = async (req, res) => {
+  try {
+    const users = await User.findAll();
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+};
+
+exports.getUserById = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Failed to fetch user:", error);
+    res.status(500).json({ error: "Failed to fetch user" });
   }
 };
