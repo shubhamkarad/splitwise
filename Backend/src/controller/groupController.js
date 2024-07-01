@@ -20,6 +20,7 @@ exports.addMembersToGroup = async (req, res) => {
   try {
     const { groupId } = req.params;
     const { members } = req.body;
+    console.log(members, "Members");
     const groupUsers = await GroupMember.bulkCreate(
       members.map((member) => ({
         userId: member,

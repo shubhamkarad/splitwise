@@ -37,6 +37,8 @@ module.exports = {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
         },
+        "light-green": "#36BA98",
+        "light-grey": "#F5F7F8",
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
@@ -76,6 +78,9 @@ module.exports = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+      },
+      backgroundImage: {
+        arrow_down: "url('/reshot-icon-diagonal-arrow-MXYKH5ECQ9.svg')",
       },
     },
   },

@@ -23,7 +23,7 @@ const Header = () => {
         path.pathname === "/" && "bg-[#eeeee]"
       }`}
     >
-      <div className="container mx-auto">
+      {/* <div className="container mx-auto">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-x-6">
             <Nav
@@ -36,7 +36,7 @@ const Header = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </header>
   );
 };

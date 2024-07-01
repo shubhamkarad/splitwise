@@ -28,6 +28,7 @@
       --input: 8 82% 92%;
       --ring: 9 99% 67%;
       --radius: 0.5rem;
+      --green: "#36BA98";
     }
 
     .dark {

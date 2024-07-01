@@ -34,6 +34,10 @@ const Expense = sequelize.define(
         key: "id",
       },
     },
+    splitType: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     timestamps: true,
@@ -65,6 +69,10 @@ const ExpenseSplit = sequelize.define(
     amount: {
       type: DataTypes.FLOAT,
       allowNull: false,
+    },
+    splitType: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

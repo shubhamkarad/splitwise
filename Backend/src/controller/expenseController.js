@@ -3,7 +3,8 @@ const { GroupMember, Group } = require("../../models/group");
 const { User } = require("../../models/user");
 exports.createExpense = async (req, res) => {
   try {
-    const { amount, description, groupId, paidBy, splits } = req.body;
+    const { amount, description, groupId, paidBy, splits, splitType } =
+      req.body;
     const isMember = await GroupMember.findOne({
       where: { groupId, userId: paidBy },
     });
@@ -17,6 +18,7 @@ exports.createExpense = async (req, res) => {
       description,
       groupId,
       paidBy,
+      splitType,
     });
 
     let expenseSplits = [];
@@ -26,6 +28,7 @@ exports.createExpense = async (req, res) => {
         expenseId: expense.id,
         userId: split.userId,
         amount: split.amount,
+        splitType: splitType,
       }));
     } else {
       //  Split equally among all the users
@@ -35,6 +38,7 @@ exports.createExpense = async (req, res) => {
         expenseId: expense.id,
         userId: member.userId,
         amount: splitAmount,
+        splitType,
       }));
     }
     // Bulk create expense splits
