@@ -1,18 +1,24 @@
 import axios from "axios";
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { getGroups } from "../service/groupService";
+import { toast } from "react-hot-toast";
+// import { LoadingContext } from "./LoadingContext";
 
 export const AuthContext = createContext();
 const API_URL = "http://localhost:3200/api";
+
 export const AuthProvider = ({ children }) => {
+  // const { setIsLoading } = useContext(LoadingContext);
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [groups, setGroups] = useState([]);
   const [activeGroup, setActiveGroup] = useState(null);
   const [members, setMembers] = useState([]);
   const [expenses, setExpenses] = useState([]);
-
+  const [loggedInUserInfo, setLoggedInUserInfo] = useState(null);
   let storedUser;
   useEffect(() => {
+    // setIsLoading(true);
     storedUser = JSON.parse(localStorage.getItem("user"));
     const token = localStorage.getItem("token");
     if (storedUser && token) {
@@ -29,6 +35,13 @@ export const AuthProvider = ({ children }) => {
       try {
         const response = await apiClient.get(`${API_URL}/auth/users`);
         console.log(response.data, "Meme");
+        const loggedInUser = response.data.filter(
+          (user) => user.name === storedUser
+        );
+        console.log(loggedInUser, "Logged in user");
+        const loggedInUserId = loggedInUser[0];
+        console.log(loggedInUserId, "First logged in user");
+        setLoggedInUserInfo(loggedInUserId);
         setMembers(response.data);
       } catch (error) {
         console.error("Failed to fetch members", error);
@@ -36,6 +49,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     fetchMembers();
+    // setIsLoading(false);
   }, []);
 
   const token = localStorage.getItem("token");
@@ -56,23 +70,19 @@ export const AuthProvider = ({ children }) => {
       // const userData = response.data;
       setUser(user);
       localStorage.setItem("user", JSON.stringify(user?.name));
+      localStorage.setItem("id", JSON.stringify(user?.id));
       localStorage.setItem("token", token1);
     } catch (err) {
       console.log("Something went wrong");
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (values) => {
     try {
-      const response = await apiClient.post(`${API_URL}/auth/register`, {
-        name,
-        email,
-        password,
-      });
-      const userData = response.data;
-      setUser(userData);
-      localStorage.setItem("user", JSON.stringify(userData.user));
-      localStorage.setItem("token", userData.token);
+      await apiClient.post(`${API_URL}/auth/register`, values);
+      toast.success("Registration successful", { className: "toast-success" });
+      // const userData = response.data;
+      // setUser(userData);
     } catch (err) {
       console.log("Registration failed");
     }
@@ -110,7 +120,9 @@ export const AuthProvider = ({ children }) => {
       console.error("Failed to add member", error);
     }
   };
-
+  const setLoader = (value) => {
+    setIsLoading(value);
+  };
   const createExpense = async (expenseData) => {
     try {
       const response = await apiClient.post("/expenses", expenseData);
@@ -135,6 +147,9 @@ export const AuthProvider = ({ children }) => {
         storedUser,
         createExpense,
         expenses,
+        loggedInUserInfo,
+        isLoading,
+        setLoader,
       }}
     >
       {children}

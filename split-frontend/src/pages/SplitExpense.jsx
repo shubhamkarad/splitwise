@@ -1,20 +1,25 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { submitExpense } from "../service/expenseService";
+import { getGroupDetails } from "../service/groupService";
+import { FaCheck } from "react-icons/fa";
 
-function SplitExpense() {
+function SplitExpense({ expenseData, setExpenseData }) {
   const navigate = useNavigate();
-  const { state } = useLocation();
-  const { expenseData } = state;
+  const { id } = useParams();
+  const [users, setusers] = useState([]);
 
-  // Simulated list of users, replace with actual data or fetch from API
-  const users = [
-    { id: "1", name: "User 1" },
-    { id: "2", name: "User 2" },
-    { id: "3", name: "User 3" },
-    { id: "4", name: "User 4" },
-  ];
+  useEffect(() => {
+    const fetchGroupDetails = async () => {
+      const fetchedDetails = await getGroupDetails(id);
+      console.log(fetchedDetails, "Details");
+      setEqualSplits(fetchedDetails.Users);
+      setManualSplits(fetchedDetails.Users);
+    };
+    fetchGroupDetails();
+  }, []);
 
   const [equalSplits, setEqualSplits] = useState(
     users.map((user) => ({
@@ -46,20 +51,26 @@ function SplitExpense() {
     );
   };
 
-  const handleSubmit = (splitType) => {
+  const handleSubmit = async (splitType) => {
     let splits;
     if (splitType === "equally") {
       const includedUsers = equalSplits.filter((user) => user.included);
-      const splitAmount = expenseData.amount / includedUsers.length;
+      console.log(includedUsers, "Includede user");
+      // const splitAmount = expenseData.amount / includedUsers.length;
       splits = includedUsers.map((user) => ({
         userId: user.id,
-        amount: splitAmount,
       }));
     } else {
       splits = manualSplits;
     }
 
     const updatedExpenseData = { ...expenseData, splits, splitType };
+    try {
+      console.log("first", updatedExpenseData);
+      await submitExpense(updatedExpenseData);
+    } catch (err) {
+      console.log("something went wrong", err);
+    }
     // Submit logic (API call, etc.)
     console.log("Submitting expense with splits:", updatedExpenseData);
     navigate("/");
@@ -80,23 +91,25 @@ function SplitExpense() {
       </div>
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Split Expense</h1>
-        <Tabs>
+        <Tabs defaultValue="equally">
           <TabsList>
-            <TabsTrigger>Equally</TabsTrigger>
-            <TabsTrigger>Manually</TabsTrigger>
+            <TabsTrigger value="equally">Equally</TabsTrigger>
+            <TabsTrigger value="manually">Manually</TabsTrigger>
           </TabsList>
-          <TabsContent>
-            <div className="grid grid-cols-2 gap-4">
+          <TabsContent value="equally">
+            <div className="grid gap-4 py-4 px-2">
               {equalSplits.map((user) => (
-                <div key={user.id} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={user.id}
-                    checked={user.included}
-                    onChange={() => handleEqualCheckboxChange(user.id)}
-                    className="mr-2"
-                  />
-                  <label htmlFor={user.id}>{user.name}</label>
+                <div
+                  key={user.id}
+                  className="flex items-center justify-between"
+                >
+                  <div htmlFor={user.id}>{user.name}</div>
+                  <div
+                    onClick={() => handleEqualCheckboxChange(user.id)}
+                    className="w-6 h-6 border rounded flex items-center justify-center cursor-pointer"
+                  >
+                    {user.id && <FaCheck />}
+                  </div>
                 </div>
               ))}
             </div>
@@ -107,7 +120,7 @@ function SplitExpense() {
               Submit Equal Split
             </button>
           </TabsContent>
-          <TabsContent>
+          <TabsContent value="manually">
             <div className="grid grid-cols-1 gap-4">
               {manualSplits.map((user) => (
                 <div key={user.id} className="flex items-center">

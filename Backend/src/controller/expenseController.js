@@ -22,7 +22,7 @@ exports.createExpense = async (req, res) => {
     });
 
     let expenseSplits = [];
-    if (splits && splits.length > 0) {
+    if (splits && splits.length > 0 && splitType === "manually") {
       // Use provided split
       expenseSplits = splits.map((split) => ({
         expenseId: expense.id,
@@ -33,8 +33,14 @@ exports.createExpense = async (req, res) => {
     } else {
       //  Split equally among all the users
       const groupMembers = await GroupMember.findAll({ where: { groupId } });
-      const splitAmount = amount / groupMembers.length;
-      expenseSplits = groupMembers.map((member) => ({
+      console.log(
+        splits.length,
+        amount,
+        "Amount--------------------------------"
+      );
+      const splitAmount = amount / splits.length;
+      console.log(splits, amount, "Split Amount");
+      expenseSplits = splits.map((member) => ({
         expenseId: expense.id,
         userId: member.userId,
         amount: splitAmount,
@@ -123,6 +129,43 @@ exports.getGroupExpenses = async (req, res) => {
       return res
         .status(404)
         .json({ error: "No expenses found for this group" });
+    } else {
+      return res.status(200).json(expenses);
+    }
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+exports.getExpense = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const expenses = await Expense.findOne({
+      where: { id },
+      include: [
+        {
+          model: Group,
+          attributes: ["id", "name"],
+        },
+        {
+          model: User,
+          as: "paidByUser",
+          attributes: ["id", "name"],
+        },
+        {
+          model: ExpenseSplit,
+          include: [
+            {
+              model: User,
+              attributes: ["id", "name"],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (expenses.length === 0) {
+      return res.status(404).json({ error: "No expenses found " });
     } else {
       return res.status(200).json(expenses);
     }

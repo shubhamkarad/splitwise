@@ -5,6 +5,8 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 import { getGroupDetails } from "../service/groupService";
 import Avatar from "react-avatar";
+import { getGroupExpenses } from "../service/expenseService";
+import ExpensePage from "./ExpensePage";
 
 const getRandomColor = () => {
   const letters = "0123456789ABCDEF";
@@ -20,7 +22,7 @@ const GroupDetails = () => {
   const { groups } = useContext(AuthContext);
   //   const [group, setGroup] = useState(null);
   const [group, setGroupDetails] = useState("");
-
+  const [expenses, setExpenseDetails] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
     // const foundGroup = groups.find((group) => group.id === id);
@@ -32,6 +34,13 @@ const GroupDetails = () => {
       console.log(fetchedDetails, "Details");
     };
     fetchGroupDetails();
+
+    const groupExpenses = async () => {
+      const fetchExpenses = await getGroupExpenses(id);
+      setExpenseDetails(fetchExpenses);
+      console.log(fetchExpenses, "Expenses");
+    };
+    groupExpenses();
     // }, []);
   }, []);
 
@@ -40,7 +49,7 @@ const GroupDetails = () => {
   }
 
   return (
-    <div className="px-2 relative">
+    <div className="px-2 h-screen relative">
       <div className="flex items-center justify-between mb-2">
         <div onClick={() => navigate(-1)}>
           <ion-icon name="arrow-back-outline" size="large"></ion-icon>
@@ -64,7 +73,7 @@ const GroupDetails = () => {
             </Link>
           </div>
           <div className="text-xl font-bold text-center h-[50vh] flex items-center justify-center">
-            You're the onle one here!
+            You're the only one here!
           </div>
         </div>
       ) : (
@@ -102,15 +111,19 @@ const GroupDetails = () => {
               </Link>
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center mt-4 h-[400px]">
-            <h4 className="text-l font-medium text-center">
-              No expenses here yet.
-            </h4>
-            <p className="text-center mt-3">
-              Add an expenses to get this party started.
-            </p>
-            <div className="bg-arrow_down w-[90px] h-[90px] bg-no-repeat transform rotate-90 scale-y-[1] translate-x-0 translate-y-10"></div>
-          </div>
+          {expenses?.data?.length === 0 ? (
+            <div className="flex flex-col items-center justify-center mt-4 h-[400px]">
+              <h4 className="text-l font-medium text-center">
+                No expenses here yet.
+              </h4>
+              <p className="text-center mt-3">
+                Add an expenses to get this party started.
+              </p>
+              <div className="bg-arrow_down w-[90px] h-[90px] bg-no-repeat transform rotate-90 scale-y-[1] translate-x-0 translate-y-10"></div>
+            </div>
+          ) : (
+            <ExpensePage expenses={expenses} />
+          )}
           <button
             class="fixed  right-10  mt-6 rounded-lg border border-primary py-2 px-4 font-sans text-xs font-bold uppercase text-primary transition-all hover:opacity-75 focus:ring focus:ring-pink-200 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
             data-ripple-dark="true"

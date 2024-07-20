@@ -61,8 +61,29 @@ body {
   font-size: 18px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  box-sizing: border-box;
+  min-height: 100vh;
 }
-
+#root {
+  padding: 0;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
 code {
   font-family: "Montserrat";
+}
+.toast-error {
+  border: 1px solid #f1474762 !important;
+  border-radius: 10px !important;
+  background: #f1000062 !important;
+  color: #fff !important;
+  margin-bottom: 100px;
+}
+.toast-success {
+  border: 1px solid #39801862 !important;
+  border-radius: 10px !important;
+  background: #0c7a0062 !important;
+  color: #fff !important;
+  margin-bottom: 100px;
 }

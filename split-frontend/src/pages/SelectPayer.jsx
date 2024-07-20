@@ -3,11 +3,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getGroupDetails } from "service/groupService";
 
-function SelectPayer() {
+function SelectPayer({ expenseData, setExpenseData }) {
   const { state } = useLocation();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { expenseData } = state;
   const { members } = useContext(AuthContext);
   const [users, setusers] = useState([]);
   const [isLoading, setLoading] = useState(false);
@@ -45,6 +44,7 @@ function SelectPayer() {
   const handleSubmit = () => {
     // Update expenseData with selected payer
     const updatedExpenseData = { ...expenseData, paidBy: selectedUserId };
+    setExpenseData(updatedExpenseData);
     // Submit logic (API call, etc.)
     console.log("Submitting expense with selected payer:", updatedExpenseData);
     navigate(-1);
@@ -61,7 +61,7 @@ function SelectPayer() {
               <div>
                 <ion-icon name="arrow-back-outline" size="large"></ion-icon>
               </div>
-              <div className="mb-1 ml-4 font-medium">Select Payer</div>
+              <div className="mb-1 ml-4 font-medium">Who paid?</div>
             </div>
             <div className="" onClick={handleSubmit}>
               <ion-icon name="checkmark-outline" size="large"></ion-icon>
@@ -82,10 +82,10 @@ function SelectPayer() {
                     <div>
                       <input
                         type="checkbox"
+                        className="w-6 h-6 border rounded flex items-center justify-center cursor-pointer"
                         id={user.id}
                         checked={user.id === selectedUserId}
                         onChange={() => handleCheckboxChange(user.id)}
-                        className="mr-2"
                       />
                     </div>
                   </div>

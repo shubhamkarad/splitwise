@@ -4,34 +4,44 @@ import { FaRupeeSign } from "react-icons/fa";
 import { TbFileDescription } from "react-icons/tb";
 import { AuthContext } from "../context/authContext";
 import { getGroupDetails } from "service/groupService";
-function AddExpense() {
+function AddExpense({ expenseData, setExpenseData }) {
   const navigate = useNavigate();
   const { id } = useParams();
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-
+  const { loggedInUserInfo } = useContext(AuthContext);
+  // const [expenseData, setExpenseData] = useState({
+  //   amount: parseFloat(amount),
+  //   description,
+  //   groupId: id,
+  //   paidBy: loggedInUserInfo.id,
+  //   splitType: "equally",
+  //   splits: [],
+  // });
   const handleNext = () => {
-    const expenseData = {
+    setExpenseData({
+      ...expenseData,
       amount: parseFloat(amount),
       description,
       groupId: id,
-      paidBy: "You",
+      paidBy: loggedInUserInfo.id,
       splitType: "equally",
       splits: [],
-    };
-    navigate(`/select-payer/${id}`, { state: { expenseData } });
+    });
+    navigate(`/select-payer/${id}`);
   };
 
   const handleSplitEqually = () => {
-    const expenseData = {
+    setExpenseData({
+      ...expenseData,
       amount: parseFloat(amount),
       description,
       groupId: id,
-      paidBy: "You",
+      paidBy: loggedInUserInfo.id,
       splitType: "equally",
       splits: [],
-    };
-    navigate(`/split-expense/${id}`, { state: { expenseData } });
+    });
+    navigate(`/split-expense/${id}`);
   };
 
   return (
@@ -92,7 +102,9 @@ function AddExpense() {
           className="ml-2 border bg-transperent px-2 py-2 rounded-lg"
           onClick={handleNext}
         >
-          You
+          {loggedInUserInfo.id === expenseData?.paidBy
+            ? "You"
+            : expenseData.paidBy}
         </button>{" "}
         and split{" "}
         <button

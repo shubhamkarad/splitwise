@@ -28,3 +28,41 @@ export const getGroupDetails = async (groupId) => {
     console.error("Failed to load groups", error);
   }
 };
+
+export const submitExpense = async (expense) => {
+  try {
+    const response = await apiClient.post(`${API_URL}/expenses`, expense);
+    return response;
+  } catch (err) {
+    console.log("Something went wrong", err);
+  }
+};
+
+export const getGroupExpenses = async (groupId) => {
+  try {
+    const response = await apiClient.get(`${API_URL}/expenses/${groupId}`);
+    return response;
+  } catch (error) {
+    console.error("Failed to load groups", error);
+  }
+};
+
+export const getSingleExpense = async (expenseId) => {
+  try {
+    const response = await apiClient.get(
+      `${API_URL}/expenses/details/${expenseId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to load groups", error);
+  }
+};
+
+export const getUserById = async (userId) => {
+  try {
+    const response = await apiClient.get(`${API_URL}/auth/user/${userId}`);
+    return response;
+  } catch (error) {
+    console.error("Failed to get the user Info", error);
+  }
+};
